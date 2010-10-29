@@ -3,29 +3,29 @@ require 'shoulda/context'
 module ShouldaContextExtensions
   def self.included(base)
     base.class_eval do
-      alias_method_chain :build, :fast_context
-      alias_method_chain :am_subcontext?, :fast_context
+      alias_method_chain :build, :setup_once_context
+      alias_method_chain :am_subcontext?, :setup_once_context
     end
   end
 
-  def fast_context(name, &blk)
-    @fast_subcontexts ||= []
-    @fast_subcontexts << Shoulda::FastContext.new(name, self, &blk)
+  def setup_once_context(name, &blk)
+    @setup_once_contexts ||= []
+    @setup_once_contexts << Shoulda::SetupOnceContext.new(name, self, &blk)
   end
 
-  def build_with_fast_context
-    build_without_fast_context
-    @fast_subcontexts ||= []
-    @fast_subcontexts.each {|f| f.build }
+  def build_with_setup_once_context
+    build_without_setup_once_context
+    @setup_once_contexts ||= []
+    @setup_once_contexts.each {|f| f.build }
   end
 
-  def am_subcontext_with_fast_context?
-    parent.is_a?(Shoulda::Context) || parent.is_a?(Shoulda::FastContext)
+  def am_subcontext_with_setup_once_context?
+    parent.is_a?(Shoulda::Context) || parent.is_a?(Shoulda::SetupOnceContext)
   end
 end
 
 module Shoulda
-  class FastContext < Context
+  class SetupOnceContext < Context
     def create_test_from_should_hash
       test_name = ["test:", full_name, "should", "run_fast"].flatten.join(' ').to_sym
 
@@ -60,8 +60,8 @@ module Shoulda
       create_test_from_should_hash
       subcontexts.each {|context| context.build }
 
-      @fast_subcontexts ||= []
-      @fast_subcontexts.each {|f| f.build }
+      @setup_once_contexts ||= []
+      @setup_once_contexts.each {|f| f.build }
 
       print_should_eventuallys
     end
@@ -69,14 +69,15 @@ module Shoulda
 end
 
 class ActiveSupport::TestCase
-  def self.fast_context(name, &blk)
+  def self.setup_once_context(name, &blk)
     if Shoulda.current_context
       Shoulda.current_context.fast_context(name, &blk)
     else
-      context = Shoulda::FastContext.new(name, self, &blk)
+      context = Shoulda::SetupOnceContext.new(name, self, &blk)
       context.build
     end
   end  
 end
 
 Shoulda::Context.send :include, ShouldaContextExtensions
+
