@@ -1,7 +1,7 @@
-FastContext
+SetupOnceContext
 ===========
 
-Make your shoulda contexts faster by combining the 'should' blocks.
+Make your shoulda contexts faster by combining the 'should' blocks (e.g. setup is called only once).
 
 See http://m.onkey.org/2009/9/20/make-your-shoulda-tests-faster-with-fast_context for details.
 
@@ -10,11 +10,11 @@ Installation
 
 Step 1 : Install the plugin
 
-  $ script/plugin install git://github.com/lifo/fast_context.git
+  $ script/plugin install git://github.com/jpfuentes2/setup_once_context.git
 
-Step 2 : Require fast_context from the test helper
+Step 2 : Require setup_once_context from the test helper
 
   # RAILS_ROOT/test/test_helper.rb
-  require 'fast_context'
+  require 'setup_once_context'
 
 Copyright (c) 2009 Pratik Naik, released under the MIT license

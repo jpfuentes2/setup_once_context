@@ -1,4 +1,3 @@
-puts "Loading fast_context"
 require 'shoulda/context'
 
 module ShouldaContextExtensions
